@@ -7,7 +7,7 @@ interface BookingCardProps {
   available: boolean;
   price: number;
   maxParticipants: number;
-  onBook: (time: string) => void;
+  onBook: (time: string, price: number) => void;
 }
 
 export const BookingCard = ({ time, available, price, maxParticipants, onBook }: BookingCardProps) => {
@@ -35,7 +35,7 @@ export const BookingCard = ({ time, available, price, maxParticipants, onBook }:
         <Button 
           variant={available ? "racing" : "secondary"} 
           disabled={!available}
-          onClick={() => onBook(time)}
+          onClick={() => onBook(time, price)}
           className="w-full"
         >
           {available ? "Book Now" : "Unavailable"}
