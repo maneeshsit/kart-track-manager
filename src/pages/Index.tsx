@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/gokart-hero.jpg";
+import { FloatingAppDownload } from "@/components/FloatingAppDownload";
 
 const Index = () => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -80,6 +81,9 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Floating App Download */}
+      <FloatingAppDownload />
+      
       {/* Navigation Header */}
       <nav className="absolute top-0 left-0 right-0 z-20 p-6">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
