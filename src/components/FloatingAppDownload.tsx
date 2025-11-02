@@ -9,7 +9,7 @@ export const FloatingAppDownload = () => {
           {/* Left text section */}
           <div className="text-left">
             <h3 className="text-2xl font-bold text-primary tracking-tight">
-              DOWNLOAD THE APP
+              Download the App
             </h3>
           </div>
           
