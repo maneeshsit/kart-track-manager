@@ -115,9 +115,9 @@ const Index = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => navigate("/auth")}
-                className="text-white border-white/20 hover:bg-white/10"
+                className="text-black border-white/20 hover:bg-white/10"
               >
-                <LogIn className="h-4 w-4 mr-2" />
+                <LogIn className="h-4 w-4 mr-2 text-black" />
                 Login
               </Button>
             )}
@@ -157,7 +157,7 @@ const Index = () => {
                 <Button 
                   variant="outline" 
                   size="lg" 
-                  className="text-white border-white/20 hover:bg-white/10 ml-4"
+                  className="text-black border-white/20 hover:bg-white/10 ml-4"
                   onClick={() => navigate("/auth")}
                 >
                   Login to Book
