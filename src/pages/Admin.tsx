@@ -4,11 +4,15 @@ import { AdminSidebar } from "@/components/AdminSidebar";
 import { AdminDashboard } from "@/components/AdminDashboard";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 const Admin = () => {
   const { user, signOut, loading } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [loginError, setLoginError] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [checkingAdmin, setCheckingAdmin] = useState(true);
   const [realStats, setRealStats] = useState({
     totalBookings: 0,
     totalRevenue: 0,
@@ -18,9 +22,44 @@ const Admin = () => {
 
   useEffect(() => {
     if (user) {
-      fetchDashboardStats();
+      checkAdminStatus();
+    } else {
+      setCheckingAdmin(false);
+      setIsAdmin(false);
     }
   }, [user]);
+
+  useEffect(() => {
+    if (user && isAdmin) {
+      fetchDashboardStats();
+    }
+  }, [user, isAdmin]);
+
+  const checkAdminStatus = async () => {
+    if (!user) {
+      setCheckingAdmin(false);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+
+      if (error) {
+        setIsAdmin(false);
+      } else {
+        setIsAdmin(!!data);
+      }
+    } catch {
+      setIsAdmin(false);
+    } finally {
+      setCheckingAdmin(false);
+    }
+  };
 
   const fetchDashboardStats = async () => {
     try {
@@ -54,27 +93,36 @@ const Admin = () => {
         activeUsers: activeUsers || 0,
         todayBookings: todayBookings || 0,
       });
-    } catch (error) {
-      console.error('Error fetching dashboard stats:', error);
+    } catch {
+      // Silently handle error - stats will remain at default values
     }
   };
 
   const handleLogin = async (email: string, password: string) => {
-    // Demo credentials for admin access
-    if (email === "admin@gokart.com" && password === "racing123") {
-      setLoginError("");
-      // In a real app, you'd have proper admin authentication
-    } else {
-      setLoginError("Invalid admin credentials");
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        setLoginError("Invalid credentials. Please try again.");
+      } else {
+        setLoginError("");
+      }
+    } catch {
+      setLoginError("An error occurred. Please try again.");
     }
   };
 
   const handleLogout = async () => {
     await signOut();
     setActiveTab("dashboard");
+    setIsAdmin(false);
+    navigate("/");
   };
 
-  if (loading) {
+  if (loading || checkingAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-racing">
         <div className="text-white text-xl">Loading...</div>
@@ -82,11 +130,27 @@ const Admin = () => {
     );
   }
 
-  // For demo purposes, check for demo admin credentials or any logged-in user
-  const isAdminLoggedIn = user && (user.email === "admin@gokart.com" || user);
-
-  if (!isAdminLoggedIn) {
+  if (!user) {
     return <LoginForm onLogin={handleLogin} error={loginError} />;
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center p-8">
+          <h1 className="text-2xl font-bold text-destructive mb-4">Access Denied</h1>
+          <p className="text-muted-foreground mb-4">
+            You do not have admin privileges to access this page.
+          </p>
+          <button
+            onClick={() => navigate("/")}
+            className="text-primary hover:underline"
+          >
+            Return to Home
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
