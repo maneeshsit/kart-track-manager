@@ -153,7 +153,7 @@ export function CookieConsent() {
             </Button>
             <Button
               onClick={handleAcceptAll}
-              className="rounded-full bg-accent px-6 py-2 text-accent-foreground hover:bg-accent/90 font-medium"
+              className="rounded-full bg-primary px-6 py-2 text-primary-foreground hover:bg-primary/90 font-medium"
             >
               Accept all
             </Button>
